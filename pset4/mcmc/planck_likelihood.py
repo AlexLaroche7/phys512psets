@@ -21,3 +21,21 @@ def get_spectrum(pars,lmax=3000):
     cmb=powers['total']
     tt=cmb[:,0]    #you could return the full power spectrum here if you wanted to do say EE
     return tt[2:]
+
+def plot_spectrum(pars,lmax=3000):
+    planck=np.loadtxt('mcmc/COM_PowerSpect_CMB-TT-full_R3.01.txt',skiprows=1)
+    ell=planck[:,0]
+    spec=planck[:,1]
+    errs=0.5*(planck[:,2]+planck[:,3])
+    model=get_spectrum(pars)
+    model=model[:len(spec)]
+    resid=spec-model
+    chisq=np.sum( (resid/errs)**2)
+    print("chisq is ",chisq," for ",len(resid)-len(pars)," degrees of freedom.")
+    #read in a binned version of the Planck PS for plotting purposes
+    planck_binned=np.loadtxt('mcmc/COM_PowerSpect_CMB-TT-binned_R3.01.txt',skiprows=1)
+    errs_binned=0.5*(planck_binned[:,2]+planck_binned[:,3])
+    plt.clf()
+    plt.plot(ell,model)
+    plt.errorbar(planck_binned[:,0],planck_binned[:,1],errs_binned,fmt='.')
+    plt.show()
